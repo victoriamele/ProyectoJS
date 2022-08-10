@@ -1,6 +1,7 @@
 //Variables iniciales
 let comprar = true;
 let iniciar;
+let seguir;
 let instrumento;
 let modelo;
 let agregar;
@@ -303,7 +304,7 @@ while (comprar) {
             break;
     }
 
-    let seguir = prompt("¿Quiere agregar productos?" + "\n" + respuestas.join(''));
+        seguir = prompt("¿Quiere agregar productos?" + "\n" + respuestas.join(''));
         while ((seguir != "1") && (seguir !="2")) {
             alert("Ingrese un comando válido");
             seguir = prompt("¿Quiere agregar productos?" + "\n" + respuestas.join(''));
@@ -316,7 +317,6 @@ while (comprar) {
                 comprar = false;
                 break;
         }
-        break;
 }
 
 
