@@ -27,6 +27,10 @@
 }
 
 /*------estilo general------*/
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background-color: #1f191d;
     font-family: 'Jost';
