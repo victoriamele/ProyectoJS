@@ -1,332 +1,200 @@
-//Variables iniciales
-let comprar = true;
-let iniciar;
-let seguir;
-let instrumento;
-let modelo;
-let agregar;
-let precio = 0;
-let total = 0;
-
-
-//Arrays
-const respuestas = ["1) Sí, por favor.\n", "2) No, gracias.\n"];
-const categorias = ["1) Guitarras.\n", "2) Bajos.\n", "3) Pianos.\n", "4) Mixers. \n"];
-const guitarras = ["1) Yamaha CX-40.\n", "2) Yamaha F-370 BL.\n", "3) Yamaha PAC-112J BL.\n"];
-const bajos = ["1) Yamaha TRBX174.\n", "2) Yamaha TRBX304.\n", "3) Yamaha TRBX305.\n"];
-const pianos = ["1) Yamaha PSR-E473.\n", "2) Yamaha P-45.\n", "3)Yamaha P-125.\n"];
-const mixers = ["1) Yamaha MG06.\n", "2) Yamaha MG10XU.\n", "3)Yamaha MG20XU.\n"];
-
-
-//Se determina si el usario quiere iniciar el proceso de compra
-alert("Bienvenido a nuestra tienda!");
-    iniciar = prompt("¿Desea realizar una compra?" + "\n" + respuestas.join(''));
-    while ((iniciar != "1") && (iniciar !="2")) {
-        alert("Ingrese un comando válido");
-        iniciar = prompt("¿Desea realizar una compra?" + "\n" + respuestas.join(''));
+// Variables
+const productos = [
+    //Guitarras
+    {
+        id: 1,
+        modelo: "CX-40",
+        precio: 50970,
+        imagen: "./img/CX40.jpg"
+    },
+    {
+        id: 2,
+        modelo: "F-370",
+        precio: 69174,
+        imagen: "./img/F370BL.jfif"
+    },
+    {
+        id: 3,
+        modelo: "PAC-112J",
+        precio: 82744,
+        imagen: "./img/PAC112J.jpg"
+    },
+    //Bajos
+    {
+        id: 4,
+        modelo: "TRBX174",
+        precio: 80962,
+        imagen: "./img/TRBX174.jpg"
+    },
+    {
+        id: 5,
+        modelo: "FTRBX304",
+        precio: 136974,
+        imagen: "./img/TRBX304.webp"
+    },
+    {
+        id: 6,
+        modelo: "TRBX305",
+        precio: 160652,
+        imagen: "./img/TRBX305.jpg"
+    },
+    //Pianos
+    {
+        id: 7,
+        modelo: "PSR-E473",
+        precio: 104181,
+        imagen: "./img/PSRE473.jpg"
+    },
+    {
+        id: 8,
+        modelo: "P-45",
+        precio: 148906,
+        imagen: "./img/P45.jpg"
+    },
+    {
+        id: 9,
+        modelo: "P-125",
+        precio: 160652,
+        imagen: "./img/P125.jpg"
+    },
+    //Mixers
+    {
+        id: 10,
+        modelo: "MG06",
+        precio: 29667,
+        imagen: "./img/MG06.jpg"
+    },
+    {
+        id: 11,
+        modelo: "MG10XU",
+        precio: 59335,
+        imagen: "./img/MG10XU.jpg"
+    },
+    {
+        id: 12,
+        modelo: "MG20XU",
+        precio: 160651,
+        imagen: "./img/MG20XU.jpg"
     }
+];
 
-    switch (iniciar) {
-        case "1":
-            break;
-        case "2":
-            alert("Refresque la página en cualquier momento si cambia de opinión!")
-            comprar = false;
-            break;
-    }
+
+let carrito = [];
+const moneda = '$';
+const DOMitems = document.querySelector('#items');
+const DOMcarrito = document.querySelector('#carrito');
+const DOMtotal = document.querySelector('#total');
+const DOMbotonVaciar = document.querySelector('#boton-vaciar');
+
+// Funciones
+
+function renderizarProductos() {
+    productos.forEach((info) => {
+        // Estructura de tarjetas con Bootstrap
+        const tarjeta = document.createElement('div');
+        tarjeta.classList.add('card', 'col-sm-4', 'bg-light', 'border-dark', 'text-center');
+
+        const tarjetaBody = document.createElement('div');
+        tarjetaBody.classList.add('card-body');
+        
+        const tarjetaTitle = document.createElement('h4');
+        tarjetaTitle.classList.add('card-title', 'text-center');
+        tarjetaTitle.textContent = info.modelo;
+        
+        const tarjetaImage = document.createElement('img');
+        tarjetaImage.classList.add('img-fluid');
+        tarjetaImage.setAttribute('src', info.imagen);
+        
+        const tarjetaPrice = document.createElement('p');
+        tarjetaPrice.classList.add('card-text', 'text-center');
+        tarjetaPrice.textContent = `${info.precio}${moneda}`;
+        
+        const tarjetaBtn = document.createElement('button');
+        tarjetaBtn.classList.add('btn', 'btn-light');
+        tarjetaBtn.textContent = 'Agregar';
+        tarjetaBtn.setAttribute('marcador', info.id);
+        tarjetaBtn.addEventListener('click', addProductoAlCarrito);
+        
+        //Se agrega el contenido
+        tarjetaBody.appendChild(tarjetaImage);
+        tarjetaBody.appendChild(tarjetaTitle);
+        tarjetaBody.appendChild(tarjetaPrice);
+        tarjetaBody.appendChild(tarjetaBtn);
+        tarjeta.appendChild(tarjetaBody);
+        DOMitems.appendChild(tarjeta);
+    });
+}
+
+//Sumar productos al carriyo
+function addProductoAlCarrito(evento) {
+    carrito.push(evento.target.getAttribute('marcador'))
+    updateCarrito();
+}
+
+//Se defince la funcion para actualizar el carrito
+function updateCarrito() {
+    DOMcarrito.textContent = '';
+    const carritoSinDuplicados = [...new Set(carrito)];
+    carritoSinDuplicados.forEach((item) => {
+        const myItem = productos.filter((itemBaseDatos) => {
+            return itemBaseDatos.id === parseInt(item);
+        });
+        
+        const numeroUnidadesItem = carrito.reduce((total, itemId) => {
+            return itemId === item ? total += 1 : total;
+        }, 0);
+        
+        const myNode = document.createElement('li');
+        myNode.classList.add('list-group-item', 'text-right', 'mx-2');
+        myNode.textContent = `${numeroUnidadesItem} x ${myItem[0].modelo} - ${myItem[0].precio}${moneda}`;
+
+        // Boton para borrar
+        const myBtn = document.createElement('button');
+        myBtn.classList.add('btn', 'mx-5');
+        myBtn.textContent = 'Eliminar';
+        myBtn.style.marginLeft = '1rem';
+        myBtn.dataset.item = item;
+        myBtn.addEventListener('click', deleteItemCarrito);
+
+        
+        myNode.appendChild(myBtn);
+        DOMcarrito.appendChild(myNode);
+    });
     
+    //Calculamos el total
+    DOMtotal.textContent = calcularTotal();
+}
 
-//Ciclo para elegir los productos
-while (comprar) {
-    instrumento = prompt("Elija el número de la categoria que desee." + "\n" + categorias.join('')).toLowerCase();
-    while ((instrumento != "1") && (instrumento != "2") && (instrumento != "3") && (instrumento != "4")) {
-        alert("Esa categoria no se encuentra en nuestra lista");
-        instrumento = prompt("Elija el número de la categoria que desee." + "\n" + categorias.join('')).toLowerCase();
-    }
+//Borrar items del carrito
+function deleteItemCarrito(evento) {
+    const id = evento.target.dataset.item;
+    carrito = carrito.filter((carritoId) => {
+        return carritoId !== id;
+    });
+    updateCarrito();
+}
 
-
-    // Navegar dentro de las categorias
-    switch (instrumento) {
-        case "1":
-            modelo = prompt("Eliga el número del modelo de guitarra que desee" + "\n" + guitarras.join(''));
-            while ((modelo != "1") && (modelo != "2") && (modelo != "3")) {
-                alert("Ese modelo no se encuentra en nuestra lista");
-                modelo = prompt("Elija el número del modelo de guitarra que desee" + "\n" + guitarras.join('')).toLowerCase();
-            }
-            //Decidir si se agrega el producto al carrito de compras
-            switch (modelo) {
-                case "1":
-                    alert("Ha seleccionado la guitarra Yamaha CX-40 ($50,970)");
-                        agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("La guitarra Yamaha CX-40 se encuentra ahora en su carrito");
-                                Sumar(50970.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-
-                case "2":
-                    alert("Ha seleccionado la guitarra F-370 BL ($69,174)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("La guitarra Yamaha F-370 BL se encuentra ahora en su carrito");
-                                Sumar(69174.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-
-                case "3":
-                    alert("Ha seleccionado la guitarra PAC-112J BL ($82,744)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("La guitarra Yamaha PAC-112J BL se encuentra ahora en su carrito");
-                                Sumar(82744.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-            }
-            break;
-
-        case "2":
-            modelo = prompt("Eliga el número del modelo de bajo que desee" + "\n" + bajos.join(''));
-            while ((modelo != "1") && (modelo != "2") && (modelo != "3")) {
-                alert("Ese modelo no se encuentra en nuestra lista");
-                modelo = prompt("Elija el número del modelo de bajo que desee" + "\n" + bajos.join('')).toLowerCase();
-            }
-            //Decidir si se agrega el producto al carrito de compras
-            switch (modelo) {
-                case "1":
-                    alert("Ha seleccionado el bajo Yamaha TRBX174 ($80,962)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("El bajo Yamaha TRBX174 se encuentra ahora en su carrito");
-                                Sumar(80962.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-
-                case "2":
-                    alert("Ha seleccionado el bajo Yamaha TRBX304 ($136,974)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("El bajo Yamaha TRBX304 se encuentra ahora en su carrito");
-                                Sumar(136974.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-
-                case "3":
-                    alert("Ha seleccionado el bajo Yamaha TRBX305 ($160,651)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("El bajo Yamaha TRBX305 se encuentra ahora en su carrito");
-                                Sumar(160651.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-            }
-            break;
-
-        case "3":
-            modelo = prompt("Eliga el número del modelo de piano que desee" + "\n" + pianos.join(''));
-            while ((modelo != "1") && (modelo != "2") && (modelo != "3")) {
-                alert("Ese modelo no se encuentra en nuestra lista");
-                modelo = prompt("Elija el número del modelo de piano que desee" + "\n" + pianos.join('')).toLowerCase();
-            }
-            //Decidir si se agrega el producto al carrito de compras
-            switch (modelo) {
-                case "1":
-                    alert("Ha seleccionado el piano Yamaha PSR-E473 ($104,181)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("El piano Yamaha PSR-E473 se encuentra ahora en su carrito");
-                                Sumar(104181.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-
-                case "2":
-                    alert("Ha seleccionado el piano Yamaha P-45 ($148,906)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("El piano Yamaha P-45 se encuentra ahora en su carrito");
-                                Sumar(148906.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-
-                case "3":
-                    alert("Ha seleccionado el piano Yamaha P-125 ($235,724)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("El piano Yamaha P-125 se encuentra ahora en su carrito");
-                                Sumar(235724.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-            }
-            break;
-
-        case "4":
-            modelo = prompt("Eliga el número del modelo de mixer que desee" + "\n" + mixers.join(''));
-            while ((modelo != "1") && (modelo != "2") && (modelo != "3")) {
-                alert("Ese modelo no se encuentra en nuestra lista");
-                modelo = prompt("Elija el número del modelo de mixer que desee" + "\n" + mixers.join('')).toLowerCase();
-            }
-            //Decidir si se agrega el producto al carrito de compras
-            switch (modelo) {
-                case "1":
-                    alert("Ha seleccionado el mixer Yamaha MG06 ($29,667)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("El mixer Yamaha MG06 se encuentra ahora en su carrito");
-                                Sumar(29667.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-
-                case "2":
-                    alert("Ha seleccionado el mixer Yamaha MG10XU ($59,335)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("El mixer Yamaha MG10XU se encuentra ahora en su carrito");
-                                Sumar(59335.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-
-                case "3":
-                    alert("Ha seleccionado el mixer Yamaha MG20XU ($160,651)");
-                    agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        while ((agregar != "1") && (agregar !="2")) {
-                            alert("Ingrese un comando válido");
-                            agregar = prompt("¿Quiere agregar el producto al carrito?" + "\n" + respuestas.join(''));
-                        }
-                        switch (agregar) {
-                            case "1":
-                                alert("El mixer Yamaha MG20XU se encuentra ahora en su carrito");
-                                Sumar(160651.00);
-                                break;
-                            case "2":
-                                alert("No se ha agregado el producto a su carrito");
-                                break;
-                        }
-                        break;
-            }
-            break;
-    }
-
-        seguir = prompt("¿Quiere agregar productos?" + "\n" + respuestas.join(''));
-        while ((seguir != "1") && (seguir !="2")) {
-            alert("Ingrese un comando válido");
-            seguir = prompt("¿Quiere agregar productos?" + "\n" + respuestas.join(''));
-        }
-
-        switch (seguir) {
-            case "1":
-                break;
-            case "2":
-                comprar = false;
-                break;
-        }
+//Precio total con productos repetidos
+function calcularTotal() {
+    return carrito.reduce((total, item) => {
+        const miItem = productos.filter((itemBaseDatos) => {
+            return itemBaseDatos.id === parseInt(item);
+        });
+        return total + miItem[0].precio;
+    }, 0).toFixed(2);
 }
 
 
-//Se suma el total de la compra
-function Sumar(precio) {
-    total += precio;
-    precioTotal = total.toFixed(2);
-    return precioTotal;
+function emptyCarrito
+() {
+    carrito = [];
+    updateCarrito();
 }
 
-if (total !== 0){
-    alert(`El precio a abonar corresponde a: $${total} pesos argentinos`);
-}
+// Eventos
+DOMbotonVaciar.addEventListener('click', emptyCarrito
+);
+
+// Inicio
+renderizarProductos();
+updateCarrito();
