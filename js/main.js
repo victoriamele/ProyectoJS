@@ -1,4 +1,3 @@
-// Variables
 const productos = [
     //Guitarras
     {
@@ -78,6 +77,12 @@ const productos = [
     }
 ];
 
+//Se crea un Local Storage de los productos
+const guardarLocal = (clave, valor) => { localStorage.setItem(clave, valor) };
+//Almacenar producto por producto
+for (const producto of productos) {
+    guardarLocal(producto.id, JSON.stringify(producto));
+}
 
 let carrito = [];
 const moneda = '$';
@@ -87,7 +92,6 @@ const DOMtotal = document.querySelector('#total');
 const DOMbotonVaciar = document.querySelector('#boton-vaciar');
 
 // Funciones
-
 function renderizarProductos() {
     productos.forEach((info) => {
         // Estructura de tarjetas con Bootstrap
@@ -154,9 +158,7 @@ function updateCarrito() {
         myBtn.textContent = 'Eliminar';
         myBtn.style.marginLeft = '1rem';
         myBtn.dataset.item = item;
-        myBtn.addEventListener('click', deleteItemCarrito);
-
-        
+        myBtn.addEventListener('click', deleteItemCarrito);      
         myNode.appendChild(myBtn);
         DOMcarrito.appendChild(myNode);
     });
@@ -191,9 +193,27 @@ function emptyCarrito
     updateCarrito();
 }
 
-// Eventos
-DOMbotonVaciar.addEventListener('click', emptyCarrito
-);
+DOMbotonVaciar.addEventListener('click', () => {
+
+    Swal.fire({
+        title: 'Está seguro de vaciar el carrito?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, seguro',
+        cancelButtonText: 'No, no quiero'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Borrado!',
+                icon: 'success',
+                text: 'El carrito ha sido vaciado',
+                onOpen: emptyCarrito()
+            })
+        }
+    })
+})
+
 
 // Inicio
 renderizarProductos();
